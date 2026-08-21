@@ -1,0 +1,68 @@
+services:
+  projectmanagement-api:
+    container_name: projectmanagement-api
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: projectmanagement-api:latest
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Production}"
+      ASPNETCORE_URLS: http://+:8080
+
+      ConnectionStrings__DefaultConnection: "Data Source=/app/data/projectmanagement.db;Foreign Keys=True"
+
+      Jwt__Issuer: "ProjectManagement.Api"
+      Jwt__Audience: "ProjectManagement.Client"
+      Jwt__SecretKey: "${JWT_SECRET_KEY:?JWT_SECRET_KEY .env dosyasında tanımlanmalıdır}"
+      Jwt__ExpirationMinutes: "30"
+
+      RefreshToken__ExpirationDays: "14"
+      RefreshToken__MaximumActiveTokensPerUser: "5"
+
+      Cors__AllowedOrigins__0: "${CORS_ALLOWED_ORIGIN_0}"
+
+      InitialAdmin__Enabled: "${INITIAL_ADMIN_ENABLED:-false}"
+      InitialAdmin__FirstName: "System"
+      InitialAdmin__LastName: "Administrator"
+      InitialAdmin__Email: "${INITIAL_ADMIN_EMAIL:-}"
+      InitialAdmin__Department: "Bilgi İşlem"
+      InitialAdmin__Password: "${INITIAL_ADMIN_PASSWORD:-}"
+      
+      DatabaseBackup__Enabled: "${DATABASE_BACKUP_ENABLED:-true}"
+      DatabaseBackup__IntervalMinutes: "${DATABASE_BACKUP_INTERVAL_MINUTES:-10}"
+      DatabaseBackup__RunOnStartup: "${DATABASE_BACKUP_RUN_ON_STARTUP:-true}"
+      DatabaseBackup__BackupDirectory: "/app/backups"
+      DatabaseBackup__RetentionDays: "${DATABASE_BACKUP_RETENTION_DAYS:-7}"
+      DatabaseBackup__ValidateBackup: "${DATABASE_BACKUP_VALIDATE:-true}"
+      MailboxStorage__RootDirectory: "/app/uploads/mailbox"
+      MailboxStorage__RetentionMonths: "1"
+      MailboxStorage__CleanupIntervalHours: "6"
+      MailboxStorage__CleanupEnabled: "true"
+      
+    volumes:
+      - projectmanagement-data:/app/data
+      - "${BACKUP_HOST_PATH:-./docker-backups}:/app/backups"
+      - "${MAILBOX_UPLOAD_HOST_PATH:-./mailbox-uploads}:/app/uploads/mailbox"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail --silent http://localhost:8080/health/ready || exit 1"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  projectmanagement-data:
+    name: projectmanagement-data
