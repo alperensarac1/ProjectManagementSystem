@@ -1,0 +1,58 @@
+# .NET build output
+bin/
+obj/
+artifacts/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+
+# Visual Studio / Rider / IDE
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.sln.iml
+
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.Production.local.json
+
+# SQLite databases and journal files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Runtime storage
+backups/
+backup/
+uploads/
+mailbox-uploads/
+data/
+docker-data/
+
+# Logs
+logs/
+*.log
+
+# Tests / coverage
+TestResults/
+coverage/
+coverage.*
+*.trx
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
